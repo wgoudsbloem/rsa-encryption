@@ -11,6 +11,7 @@ import java.util.Base64;
 
 import javax.crypto.Cipher;
 
+import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.util.OpenSSHPrivateKeyUtil;
 import org.bouncycastle.crypto.util.OpenSSHPublicKeyUtil;
@@ -35,20 +36,21 @@ public class App {
         // System.out.println(privString);
 
         byte[] encrypted = encrypt(toBeEncrypted, pubString);
+        System.out.printf("encrypted password:\n%s\n", Hex.encodeHexString(encrypted));
         byte[] decrypted = decrypt(encrypted, privString);
         System.out.printf("to be encrypted: %s\n", toBeEncrypted);
         System.out.printf("decrypted back:  %s\n", new String(decrypted));
     }
 
     static byte[] encrypt(String toBeEntrypted, String pubKeyString) throws Exception {
-        byte[] b = Base64.getDecoder().decode(pubKeyString);
-        RSAKeyParameters rsa = (RSAKeyParameters) OpenSSHPublicKeyUtil.parsePublicKey(b);
+        RSAKeyParameters rsa = (RSAKeyParameters) OpenSSHPublicKeyUtil
+                .parsePublicKey(Base64.getDecoder().decode(pubKeyString));
         KeySpec keySpec = new RSAPublicKeySpec(rsa.getModulus(), rsa.getExponent());
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PublicKey key = keyFactory.generatePublic(keySpec);
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         cipher.init(Cipher.ENCRYPT_MODE, key);
-        return cipher.doFinal(toBeEntrypted.getBytes());
+        return cipher.doFinal(toBeEntrypted.getBytes("UTF-8"));
     }
 
     static byte[] decrypt(byte[] encryptedValue, String privKeyString) throws Exception {
