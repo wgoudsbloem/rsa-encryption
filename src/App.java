@@ -24,16 +24,12 @@ public class App {
         pubFile.close();
         String pubString = new String(pubFileContent);
         pubString = pubString.split(" ")[1];
-        // System.out.println(pubString);
         InputStream privFile = Files.newInputStream(Paths.get("rsa"));
         byte[] privFileContent = privFile.readAllBytes();
         privFile.close();
         String privString = new String(privFileContent);
-        privString = privString.replaceAll("\\n", "").replace("-----BEGIN PRIVATE KEY-----", "")
-                .replace("-----END PRIVATE KEY-----", "").replace("-----BEGIN OPENSSH PRIVATE KEY-----", "")
-                .replace("-----END OPENSSH PRIVATE KEY-----", "").replace("-----BEGIN RSA PRIVATE KEY-----", "")
+        privString = privString.replaceAll("\\n", "").replace("-----BEGIN RSA PRIVATE KEY-----", "")
                 .replace("-----END RSA PRIVATE KEY-----", "");
-        // System.out.println(privString);
 
         byte[] encrypted = encrypt(toBeEncrypted, pubString);
         System.out.printf("encrypted password:\n%s\n", Hex.encodeHexString(encrypted));
